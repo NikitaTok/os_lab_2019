@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
             with_files = true;
             break;
 
-          defalut:
+          default:
             printf("Index %d is out of options\n", option_index);
         }
         break;
@@ -98,13 +98,27 @@ int main(int argc, char **argv) {
       active_child_processes += 1;
       if (child_pid == 0) {
         // child process
+        // Параллельная работа с массивом
+                int start = i * (array_size / pnum);
+                int end = (i == pnum - 1) ? array_size : (i + 1) * (array_size / pnum);
+                struct MinMax local_minmax = GetMinMax(array, start, end);
+
 
         // parallel somehow
 
         if (with_files) {
           // use files here
+          // Запись в файл
+                    char filename[20];
+                    sprintf(filename, "result_%d.txt", i);
+                    FILE *fp = fopen(filename, "w");
+                    fprintf(fp, "%d %d\n", local_minmax.min, local_minmax.max);
+                    fclose(fp);
         } else {
           // use pipe here
+          // Поскольку мы уже находимся в дочернем процессе,
+          // создаем доступ к pipe для передачи данных
+          write(STDOUT_FILENO, &local_minmax, sizeof(local_minmax));
         }
         return 0;
       }
@@ -117,7 +131,8 @@ int main(int argc, char **argv) {
 
   while (active_child_processes > 0) {
     // your code here
-
+    wait(NULL); // Ожидание завершения дочерних процессов
+    
     active_child_processes -= 1;
   }
 
@@ -131,8 +146,22 @@ int main(int argc, char **argv) {
 
     if (with_files) {
       // read from files
+      // Чтение из файла
+      char filename[20];
+      sprintf(filename, "result_%d.txt", i);
+      FILE *fp = fopen(filename, "r");
+      if (fp) {
+          fscanf(fp, "%d %d", &min, &max);
+          fclose(fp);
+          remove(filename); // Удаление файла после чтения
+        }
     } else {
       // read from pipes
+      // Чтение из pipe
+      struct MinMax local_minmax;
+      read(STDIN_FILENO, &local_minmax, sizeof(local_minmax));
+      min = local_minmax.min;
+      max = local_minmax.max;
     }
 
     if (min < min_max.min) min_max.min = min;

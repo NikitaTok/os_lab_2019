@@ -1,11 +1,23 @@
 CC=gcc
 CFLAGS=-I.
+# Цель по умолчанию
+all:sequential_min_max parallel_min_max run_sequential_min_max
 
 sequential_min_max : utils.o find_min_max.o utils.h find_min_max.h
 	$(CC) -o sequential_min_max find_min_max.o utils.o sequential_min_max.c $(CFLAGS)
 
 parallel_min_max : utils.o find_min_max.o utils.h find_min_max.h
 	$(CC) -o parallel_min_max utils.o find_min_max.o parallel_min_max.c $(CFLAGS)
+
+run_sequential_min_max: run_sequential_min_max.o
+	$(CC) -o run_sequential_min_max run_sequential_min_max.o $(CFLAGS)
+# Правило для компиляции object-файла для sequential_min_max
+#sequential_min_max.o: sequential_min_max.c utils.h find_min_max.h
+#    $(CC) -o sequential_min_max.o -c sequential_min_max.c $(CFLAGS)
+
+# Правило для компиляции object-файла для parallel_min_max
+#parallel_min_max.o: parallel_min_max.c utils.h find_min_max.h
+#    $(CC) -o parallel_min_max.o -c parallel_min_max.c $(CFLAGS)
 
 utils.o : utils.h
 	$(CC) -o utils.o -c utils.c $(CFLAGS)
