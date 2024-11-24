@@ -34,9 +34,11 @@ uint64_t MultModulo(uint64_t a, uint64_t b, uint64_t mod) {
 
 uint64_t Factorial(const struct FactorialArgs *args) {
   uint64_t ans = 1;
-
+  
   // TODO: your code here
-
+  for (uint64_t i = args->begin; i <= args->end; ++i) {
+    ans = MultModulo(ans, i, args->mod);
+  }
   return ans;
 }
 
