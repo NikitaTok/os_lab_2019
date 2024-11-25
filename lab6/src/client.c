@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
   char servers[255] = {'\0'}; // TODO: explain why 255
 
   while (true) {
-    int current_optind = optind ? optind : 1;
+    //int current_optind = optind ? optind : 1;
 
     static struct option options[] = {{"k", required_argument, 0, 0},
                                       {"mod", required_argument, 0, 0},
@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
     // unite results
     uint64_t answer = 0;
     memcpy(&answer, response, sizeof(uint64_t));
-    printf("answer: %llu\n", answer);
+    printf("answer: %lu\n", answer);
 
     close(sck);
   }
